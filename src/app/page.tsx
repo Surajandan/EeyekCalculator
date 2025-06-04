@@ -20,7 +20,7 @@ const MAX_HISTORY_ITEMS = 50; // Limit history size
 
 const translations = {
   en: {
-    pageTitle: "Local Calc",
+    pageTitle: "Eeyek Calculator",
     acButton: "AC",
     digits: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
     doubleZero: "00",
@@ -28,7 +28,7 @@ const translations = {
     percentageButton: "%",
   },
   mni: {
-    pageTitle: "ꯂꯣꯀꯦꯜ ꯀꯦꯜꯛ",
+    pageTitle: "ꯏꯌꯦꯛ ꯀꯦꯜꯀꯨꯂꯦꯇꯔ",
     acButton: "AC",
     digits: ["꯰", "꯱", "꯲", "꯳", "꯴", "꯵", "꯶", "꯷", "꯸", "꯹"],
     doubleZero: "꯰꯰",
@@ -382,7 +382,7 @@ export default function CalculatorPage() {
         </CalculatorContainer>
       </main>
       <footer className="bg-muted text-muted-foreground p-4 text-center text-sm">
-        <p className="mb-2">Your Ad Here - Support Local Calc!</p>
+        <p className="mb-2">Your Ad Here - Support Eeyek Calculator!</p>
         <Image
           src="https://placehold.co/728x90.png"
           alt="Advertisement Placeholder"

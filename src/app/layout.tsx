@@ -49,8 +49,8 @@ const notoSansMeeteiMayek = localFont({
 */
 
 export const metadata: Metadata = {
-  title: 'Local Calc',
-  description: 'A simple calculator app built with Next.js',
+  title: 'Eeyek Calculator',
+  description: 'Eeyek Calculator - A simple calculator app built with Next.js',
 };
 
 export default function RootLayout({
