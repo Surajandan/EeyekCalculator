@@ -38,9 +38,6 @@ export function CalculatorHeader() {
             <DropdownMenuItem onSelect={() => handleLanguageChange("en")} disabled={selectedLanguage === "en"}>
               English
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => handleLanguageChange("es")} disabled={selectedLanguage === "es"}>
-              Español
-            </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => handleLanguageChange("mni")} disabled={selectedLanguage === "mni"}>
               Meitei Mayek (ꯃꯤꯇꯩ ꯃꯌꯦꯛ)
             </DropdownMenuItem>
