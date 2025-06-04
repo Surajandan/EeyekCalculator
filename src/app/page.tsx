@@ -23,6 +23,7 @@ const translations = {
     pageTitle: "Local Calc",
     acButton: "AC",
     digits: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    doubleZero: "00",
     decimal: ".",
     percentageButton: "%",
   },
@@ -30,6 +31,7 @@ const translations = {
     pageTitle: "ꯂꯣꯀꯦꯜ ꯀꯦꯜꯛ",
     acButton: "AC",
     digits: ["꯰", "꯱", "꯲", "꯳", "꯴", "꯵", "꯶", "꯷", "꯸", "꯹"],
+    doubleZero: "꯰꯰",
     decimal: ".",
     percentageButton: "%",
   }
@@ -84,6 +86,13 @@ export default function CalculatorPage() {
     const englishDigits = translations.en.digits;
     const targetDecimal = translations[lang].decimal;
     const englishDecimal = translations.en.decimal;
+    const targetDoubleZero = translations[lang].doubleZero;
+    const englishDoubleZero = translations.en.doubleZero;
+
+
+    if (normalized === targetDoubleZero) {
+      return englishDoubleZero;
+    }
 
     targetLangDigits.forEach((targetDigit, index) => {
       const regex = new RegExp(targetDigit.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
@@ -103,6 +112,12 @@ export default function CalculatorPage() {
     const targetLangDigits = translations[lang].digits;
     const englishDecimal = translations.en.decimal;
     const targetDecimal = translations[lang].decimal;
+    const englishDoubleZero = translations.en.doubleZero;
+    const targetDoubleZero = translations[lang].doubleZero;
+
+    if (localized === englishDoubleZero) {
+        return targetDoubleZero;
+    }
 
     englishDigits.forEach((englishDigit, index) => {
       const regex = new RegExp(englishDigit.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
@@ -117,22 +132,32 @@ export default function CalculatorPage() {
   };
 
 
-  const addDigit = (digit: string) => {
-    const englishDigit = normalizeOperand(digit, language);
-    const displayDigit = digit; 
+  const addDigit = (value: string) => { // Renamed digit to value
+    const englishValue = normalizeOperand(value, language); // Normalized value (e.g., "00", "5")
+    const displayValue = value; // Value in current language (e.g., "꯰꯰", "꯵")
 
     if (currentOperand === "Error") {
-      setCurrentOperand(displayDigit);
+      setCurrentOperand(displayValue);
       setOverwrite(false);
       return;
     }
     if (overwrite) {
-      setCurrentOperand(displayDigit);
+      // If overwriting and adding "00", and current is "0", keep it "0"
+      if (englishValue === "00" && normalizeOperand(currentOperand, language) === "0") {
+        setCurrentOperand(translations[language].digits[0]);
+      } else {
+        setCurrentOperand(displayValue);
+      }
       setOverwrite(false);
     } else {
-      if (englishDigit === "0" && normalizeOperand(currentOperand, language) === "0") return;
-      if (currentOperand.length >= 16) return; 
-      setCurrentOperand(prev => (normalizeOperand(prev, language) === "0" && englishDigit !== ".") ? displayDigit : prev + displayDigit);
+      // If current is "0" and adding "00", keep current as "0"
+      if (normalizeOperand(currentOperand, language) === "0" && englishValue === "00") return;
+      // If current is "0" and adding single "0", keep current as "0"
+      if (normalizeOperand(currentOperand, language) === "0" && englishValue === "0") return;
+      
+      if (currentOperand.length + englishValue.length > 16) return; // Check total length
+      
+      setCurrentOperand(prev => (normalizeOperand(prev, language) === "0" && englishValue !== ".") ? displayValue : prev + displayValue);
     }
   };
 
@@ -343,8 +368,11 @@ export default function CalculatorPage() {
             ))}
             <Button onClick={() => chooseOperation('add')} className={operatorButtonClass} aria-label="Add"><Plus size={24} /></Button>
 
-            <Button onClick={() => addDigit(translations[language].digits[0])} className={`${getNumberButtonClass(language)} col-span-2`}>
+            <Button onClick={() => addDigit(translations[language].digits[0])} className={getNumberButtonClass(language)}>
                 {translations[language].digits[0]}
+            </Button>
+            <Button onClick={() => addDigit(translations[language].doubleZero)} className={getNumberButtonClass(language)}>
+                {translations[language].doubleZero}
             </Button>
             <Button onClick={addDecimalPoint} className={getNumberButtonClass(language)}>
                 {translations[language].decimal}
