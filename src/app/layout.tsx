@@ -1,21 +1,23 @@
+
 import type {Metadata} from 'next';
-import localFont from 'next/font/local';
+import localFont from 'next/font/local'; // Keep for Noto Sans
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 // Define your local fonts
 // Make sure to place your font files in the src/fonts directory
 
-/* Temporarily commented out:
+// Configuration for Inter font (Temporarily commented out due to 'File not found' error)
+/*
 const inter = localFont({
   src: [
     {
-      path: '../fonts/Inter-Regular.woff2', // Adjust path and filename as needed
+      path: '../fonts/Inter-Regular.woff2',
       weight: '400',
       style: 'normal',
     },
     {
-      path: '../fonts/Inter-Bold.woff2', // Adjust path and filename as needed
+      path: '../fonts/Inter-Bold.woff2',
       weight: '700',
       style: 'normal',
     },
@@ -25,13 +27,12 @@ const inter = localFont({
 });
 */
 
-// Configuration for Noto Sans Meetei Mayek
-// TODO: Add NotoSansMeeteiMayek-Regular.woff2 (or similar) to src/fonts/
-/* Temporarily commented out due to missing font file:
+// Configuration for Noto Sans Meetei Mayek (Temporarily commented out due to 'File not found' error)
+/*
 const notoSansMeeteiMayek = localFont({
   src: [
     {
-      path: '../fonts/NotoSansMeeteiMayek-Regular.woff2', // Adjust path and filename as needed
+      path: '../fonts/NotoSansMeeteiMayek-Regular.woff2',
       weight: '400',
       style: 'normal',
     },
@@ -58,8 +59,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // Add notoSansMeeteiMayek.variable to className when re-enabled
-    // Temporarily removed inter.variable and notoSansMeeteiMayek.variable from className
+    // Apply only Noto Sans Meetei Mayek for now. Uncomment inter.variable when Inter font issue is resolved.
+    // Remove notoSansMeeteiMayek.variable as it's commented out
     <html lang="en" className={``}> 
       <head>
         {/* Google Fonts links removed as we are using local fonts now */}
