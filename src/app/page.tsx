@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CalculatorContainer } from '@/components/calculator/calculator-container';
 import { CalculatorHeader } from '@/components/calculator/calculator-header';
 import { CalculatorDisplay } from '@/components/calculator/calculator-display';
-import { Divide, X, Minus, Plus, Equal } from 'lucide-react';
+import { Divide, X, Minus, Plus, Equal, Delete } from 'lucide-react'; // Changed Backspace to Delete
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 
@@ -49,12 +49,10 @@ export default function CalculatorPage() {
     if (storedHistory) {
       setHistory(JSON.parse(storedHistory));
     }
-    // Set initial currentOperand based on language
     setCurrentOperand(translations[language].digits[0]);
-  }, []); // language is available here due to initial state
+  }, []); 
 
   useEffect(() => {
-    // When language changes, if currentOperand is "0" or "꯰", update it
     if (currentOperand === translations.en.digits[0] || currentOperand === translations.mni.digits[0]) {
       setCurrentOperand(translations[language].digits[0]);
     }
@@ -81,19 +79,17 @@ export default function CalculatorPage() {
     : '';
 
   const normalizeOperand = (operand: string, lang: keyof typeof translations) => {
-    let normalized = String(operand); // Ensure operand is a string
+    let normalized = String(operand); 
     const targetLangDigits = translations[lang].digits;
     const englishDigits = translations.en.digits;
     const targetDecimal = translations[lang].decimal;
     const englishDecimal = translations.en.decimal;
 
-    // Normalize digits from current language to English
     targetLangDigits.forEach((targetDigit, index) => {
       const regex = new RegExp(targetDigit.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
       normalized = normalized.replace(regex, englishDigits[index]);
     });
 
-    // Normalize decimal point from current language to English
     if (targetDecimal !== englishDecimal) {
       const decimalRegex = new RegExp(targetDecimal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
       normalized = normalized.replace(decimalRegex, englishDecimal);
@@ -102,19 +98,17 @@ export default function CalculatorPage() {
   };
 
   const localizeOperand = (operand: string, lang: keyof typeof translations) => {
-    let localized = String(operand); // Ensure operand is a string
+    let localized = String(operand); 
     const englishDigits = translations.en.digits;
     const targetLangDigits = translations[lang].digits;
     const englishDecimal = translations.en.decimal;
     const targetDecimal = translations[lang].decimal;
 
-    // Localize digits from English to current language
     englishDigits.forEach((englishDigit, index) => {
       const regex = new RegExp(englishDigit.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
       localized = localized.replace(regex, targetLangDigits[index]);
     });
 
-    // Localize decimal point from English to current language
     if (englishDecimal !== targetDecimal) {
        const decimalRegex = new RegExp(englishDecimal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
        localized = localized.replace(decimalRegex, targetDecimal);
@@ -125,7 +119,7 @@ export default function CalculatorPage() {
 
   const addDigit = (digit: string) => {
     const englishDigit = normalizeOperand(digit, language);
-    const displayDigit = digit; // Use the already localized digit passed to the function
+    const displayDigit = digit; 
 
     if (currentOperand === "Error") {
       setCurrentOperand(displayDigit);
@@ -137,7 +131,7 @@ export default function CalculatorPage() {
       setOverwrite(false);
     } else {
       if (englishDigit === "0" && normalizeOperand(currentOperand, language) === "0") return;
-      if (currentOperand.length >= 16) return; // Max length check
+      if (currentOperand.length >= 16) return; 
       setCurrentOperand(prev => (normalizeOperand(prev, language) === "0" && englishDigit !== ".") ? displayDigit : prev + displayDigit);
     }
   };
@@ -247,16 +241,6 @@ export default function CalculatorPage() {
     setOperation(null);
     setOverwrite(true);
   };
-
-  const toggleSign = () => {
-    if (currentOperand === "Error" || normalizeOperand(currentOperand, language) === "0") return;
-
-    const normalizedCurrentOperand = normalizeOperand(currentOperand, language);
-    let toggledValue = String(parseFloat(normalizedCurrentOperand) * -1);
-    toggledValue = localizeOperand(toggledValue, language);
-    setCurrentOperand(toggledValue);
-    setOverwrite(false); 
-  };
   
   const handlePercentage = () => {
     if (currentOperand === "Error") return;
@@ -265,11 +249,9 @@ export default function CalculatorPage() {
     let result: number;
 
     if (previousOperand && operation) {
-      // Scenario: X + Y %
       const prevNormalized = normalizeOperand(previousOperand, language);
       result = (parseFloat(prevNormalized) * parseFloat(currentNormalized)) / 100;
     } else {
-      // Scenario: Y %
       result = parseFloat(currentNormalized) / 100;
     }
     
@@ -277,14 +259,30 @@ export default function CalculatorPage() {
     resultString = localizeOperand(resultString, language);
     
     setCurrentOperand(resultString);
-    // For "X + Y %", we want to keep previousOperand and operation, and allow "=" to be pressed.
-    // For "Y %", previousOperand and operation should be cleared.
     if (!previousOperand || !operation) {
         setPreviousOperand(null);
         setOperation(null);
         setOverwrite(true);
     } else {
-        setOverwrite(false); // So the user sees the percentage value and can press =
+        setOverwrite(false); 
+    }
+  };
+
+  const handleBackspace = () => {
+    if (currentOperand === "Error" || currentOperand === translations[language].digits[0]) {
+      if (currentOperand === "Error") { // Ensure Error state also resets to 0
+        setCurrentOperand(translations[language].digits[0]);
+        setOverwrite(true);
+      }
+      return; // Do nothing if it's already "0" (localized)
+    }
+
+    if (currentOperand.length === 1) {
+      setCurrentOperand(translations[language].digits[0]);
+      setOverwrite(true);
+    } else {
+      setCurrentOperand(currentOperand.slice(0, -1));
+      setOverwrite(false); // Allow further input
     }
   };
 
@@ -300,12 +298,14 @@ export default function CalculatorPage() {
             language={language}
             onLanguageChange={(lang) => {
               const newLang = lang as keyof typeof translations;
-              setLanguage(newLang);
+              const currentNormalized = normalizeOperand(currentOperand, language);
+              setCurrentOperand(localizeOperand(currentNormalized, newLang));
               
-              setCurrentOperand(localizeOperand(normalizeOperand(currentOperand, language), newLang));
               if(previousOperand){
-                setPreviousOperand(localizeOperand(normalizeOperand(previousOperand, language), newLang));
+                const prevNormalized = normalizeOperand(previousOperand, language);
+                setPreviousOperand(localizeOperand(prevNormalized, newLang));
               }
+              setLanguage(newLang);
             }}
             translations={translations}
           />
@@ -314,48 +314,34 @@ export default function CalculatorPage() {
             <Button onClick={clearAll} className={`${getNumberButtonClass(language)}`}>
               {translations[language].acButton}
             </Button>
-            <Button onClick={toggleSign} className={getNumberButtonClass(language)}>
-               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M4 7h6"/>
-                <path d="M7 4v6"/>
-                <path d="M18 13H5"/>
-              </svg>
+            <Button onClick={handleBackspace} className={getNumberButtonClass(language)} aria-label="Backspace">
+               <Delete size={24} />
             </Button>
             <Button onClick={handlePercentage} className={getNumberButtonClass(language)}>
                 {translations[language].percentageButton}
             </Button>
-            <Button onClick={() => chooseOperation('divide')} className={operatorButtonClass}><Divide size={24} /></Button>
+            <Button onClick={() => chooseOperation('divide')} className={operatorButtonClass} aria-label="Divide"><Divide size={24} /></Button>
 
             {[7, 8, 9].map((digit) => (
               <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
                 {translations[language].digits[digit]}
               </Button>
             ))}
-            <Button onClick={() => chooseOperation('multiply')} className={operatorButtonClass}><X size={24} /></Button>
+            <Button onClick={() => chooseOperation('multiply')} className={operatorButtonClass} aria-label="Multiply"><X size={24} /></Button>
 
             {[4, 5, 6].map((digit) => (
               <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
                 {translations[language].digits[digit]}
               </Button>
             ))}
-            <Button onClick={() => chooseOperation('subtract')} className={operatorButtonClass}><Minus size={24} /></Button>
+            <Button onClick={() => chooseOperation('subtract')} className={operatorButtonClass} aria-label="Subtract"><Minus size={24} /></Button>
 
             {[1, 2, 3].map((digit) => (
               <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
                 {translations[language].digits[digit]}
               </Button>
             ))}
-            <Button onClick={() => chooseOperation('add')} className={operatorButtonClass}><Plus size={24} /></Button>
+            <Button onClick={() => chooseOperation('add')} className={operatorButtonClass} aria-label="Add"><Plus size={24} /></Button>
 
             <Button onClick={() => addDigit(translations[language].digits[0])} className={`${getNumberButtonClass(language)} col-span-2`}>
                 {translations[language].digits[0]}
@@ -363,7 +349,7 @@ export default function CalculatorPage() {
             <Button onClick={addDecimalPoint} className={getNumberButtonClass(language)}>
                 {translations[language].decimal}
             </Button>
-            <Button onClick={handleEquals} className={operatorButtonClass}><Equal size={24} /></Button>
+            <Button onClick={handleEquals} className={operatorButtonClass} aria-label="Equals"><Equal size={24} /></Button>
           </div>
         </CalculatorContainer>
       </main>
