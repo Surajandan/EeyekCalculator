@@ -20,6 +20,8 @@ export function CalculatorHeader() {
     console.log(`Language changed to: ${lang}`);
     // In a real application, you would trigger your i18n logic here
     // to update the application's text content.
+    // For Meitei Mayek, if the font is correctly set up,
+    // UI elements could use the 'font-meetei' class.
   };
 
   return (
@@ -38,6 +40,9 @@ export function CalculatorHeader() {
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => handleLanguageChange("es")} disabled={selectedLanguage === "es"}>
               Español
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleLanguageChange("mni")} disabled={selectedLanguage === "mni"}>
+              Meitei Mayek (ꯃꯤꯇꯩ ꯃꯌꯦꯛ)
             </DropdownMenuItem>
             {/* You can add more languages here */}
           </DropdownMenuContent>
