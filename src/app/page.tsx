@@ -339,11 +339,11 @@ export default function CalculatorPage() {
             <Button onClick={clearAll} className={`${getNumberButtonClass(language)}`}>
               {translations[language].acButton}
             </Button>
-            <Button onClick={handleBackspace} className={getNumberButtonClass(language)} aria-label="Backspace">
-               <Delete size={24} />
-            </Button>
             <Button onClick={handlePercentage} className={getNumberButtonClass(language)}>
                 {translations[language].percentageButton}
+            </Button>
+            <Button onClick={handleBackspace} className={getNumberButtonClass(language)} aria-label="Backspace">
+               <Delete size={24} />
             </Button>
             <Button onClick={() => chooseOperation('divide')} className={operatorButtonClass} aria-label="Divide"><Divide size={24} /></Button>
 
