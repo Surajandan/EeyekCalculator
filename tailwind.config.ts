@@ -10,9 +10,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['var(--font-inter)', 'sans-serif'], // Use the CSS variable for Inter
-        headline: ['var(--font-inter)', 'sans-serif'], // Use the CSS variable for Inter
-        meetei: ['var(--font-noto-sans-meetei-mayek)', 'sans-serif'], // Added Noto Sans Meetei Mayek
+        // Reverted to generic sans-serif stacks
+        body: ['sans-serif'],
+        headline: ['sans-serif'],
+        meetei: ['sans-serif'], 
         code: ['monospace'],
       },
       colors: {
