@@ -368,11 +368,11 @@ export default function CalculatorPage() {
             ))}
             <Button onClick={() => chooseOperation('add')} className={operatorButtonClass} aria-label="Add"><Plus size={24} /></Button>
 
-            <Button onClick={() => addDigit(translations[language].digits[0])} className={getNumberButtonClass(language)}>
-                {translations[language].digits[0]}
-            </Button>
             <Button onClick={() => addDigit(translations[language].doubleZero)} className={getNumberButtonClass(language)}>
                 {translations[language].doubleZero}
+            </Button>
+            <Button onClick={() => addDigit(translations[language].digits[0])} className={getNumberButtonClass(language)}>
+                {translations[language].digits[0]}
             </Button>
             <Button onClick={addDecimalPoint} className={getNumberButtonClass(language)}>
                 {translations[language].decimal}
