@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CalculatorContainer } from '@/components/calculator/calculator-container';
 import { CalculatorHeader } from '@/components/calculator/calculator-header';
 import { CalculatorDisplay } from '@/components/calculator/calculator-display';
-import { Divide, X, Minus, Plus, Equal, Delete } from 'lucide-react'; // Changed Backspace to Delete
+import { Divide, X, Minus, Plus, Equal, Delete } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 
@@ -43,7 +43,7 @@ export default function CalculatorPage() {
   const [operation, setOperation] = useState<string | null>(null);
   const [overwrite, setOverwrite] = useState<boolean>(true);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [language, setLanguage] = useState<keyof typeof translations>("mni"); // Default language set to 'mni'
+  const [language, setLanguage] = useState<keyof typeof translations>("mni");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -132,9 +132,9 @@ export default function CalculatorPage() {
   };
 
 
-  const addDigit = (value: string) => { // Renamed digit to value
-    const englishValue = normalizeOperand(value, language); // Normalized value (e.g., "00", "5")
-    const displayValue = value; // Value in current language (e.g., "꯰꯰", "꯵")
+  const addDigit = (value: string) => {
+    const englishValue = normalizeOperand(value, language);
+    const displayValue = value;
 
     if (currentOperand === "Error") {
       setCurrentOperand(displayValue);
@@ -142,7 +142,6 @@ export default function CalculatorPage() {
       return;
     }
     if (overwrite) {
-      // If overwriting and adding "00", and current is "0", keep it "0"
       if (englishValue === "00" && normalizeOperand(currentOperand, language) === "0") {
         setCurrentOperand(translations[language].digits[0]);
       } else {
@@ -150,12 +149,10 @@ export default function CalculatorPage() {
       }
       setOverwrite(false);
     } else {
-      // If current is "0" and adding "00", keep current as "0"
       if (normalizeOperand(currentOperand, language) === "0" && englishValue === "00") return;
-      // If current is "0" and adding single "0", keep current as "0"
       if (normalizeOperand(currentOperand, language) === "0" && englishValue === "0") return;
       
-      if (currentOperand.length + englishValue.length > 16) return; // Check total length
+      if (currentOperand.length + englishValue.length > 16) return;
       
       setCurrentOperand(prev => (normalizeOperand(prev, language) === "0" && englishValue !== ".") ? displayValue : prev + displayValue);
     }
@@ -295,11 +292,11 @@ export default function CalculatorPage() {
 
   const handleBackspace = () => {
     if (currentOperand === "Error" || currentOperand === translations[language].digits[0]) {
-      if (currentOperand === "Error") { // Ensure Error state also resets to 0
+      if (currentOperand === "Error") {
         setCurrentOperand(translations[language].digits[0]);
         setOverwrite(true);
       }
-      return; // Do nothing if it's already "0" (localized)
+      return;
     }
 
     if (currentOperand.length === 1) {
@@ -307,7 +304,7 @@ export default function CalculatorPage() {
       setOverwrite(true);
     } else {
       setCurrentOperand(currentOperand.slice(0, -1));
-      setOverwrite(false); // Allow further input
+      setOverwrite(false);
     }
   };
 
@@ -336,13 +333,13 @@ export default function CalculatorPage() {
           />
           <CalculatorDisplay currentOperand={currentOperand} expressionPreview={expressionPreview} />
           <div className="grid grid-cols-4 gap-2 sm:gap-3">
-            <Button onClick={clearAll} className={`${getNumberButtonClass(language)}`}>
+            <Button onClick={clearAll} className={operatorButtonClass}>
               {translations[language].acButton}
             </Button>
-            <Button onClick={handlePercentage} className={getNumberButtonClass(language)}>
+            <Button onClick={handlePercentage} className={operatorButtonClass}>
                 {translations[language].percentageButton}
             </Button>
-            <Button onClick={handleBackspace} className={getNumberButtonClass(language)} aria-label="Backspace">
+            <Button onClick={handleBackspace} className={operatorButtonClass} aria-label="Backspace">
                <Delete size={24} />
             </Button>
             <Button onClick={() => chooseOperation('divide')} className={operatorButtonClass} aria-label="Divide"><Divide size={24} /></Button>
@@ -396,3 +393,6 @@ export default function CalculatorPage() {
     </div>
   );
 }
+
+
+    
