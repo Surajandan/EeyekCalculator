@@ -2,13 +2,15 @@
 "use client";
 
 import Link from 'next/link';
-import { History } from 'lucide-react'; // Removed Languages import
+import { History, Info } from 'lucide-react'; // Added Info import
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import type { Dispatch, SetStateAction } from 'react';
 
@@ -21,6 +23,16 @@ interface CalculatorHeaderProps {
 export function CalculatorHeader({ language, onLanguageChange, translations }: CalculatorHeaderProps) {
   const handleLanguageSelect = (lang: string) => {
     onLanguageChange(lang);
+  };
+
+  const handleHelpClick = () => {
+    console.log("Help clicked");
+    // Potentially navigate to a help page or open a help modal
+  };
+
+  const handleAboutClick = () => {
+    console.log("About clicked");
+    // Potentially navigate to an about page or open an about modal
   };
 
   const currentTranslationSet = translations[language] || translations.en;
@@ -53,7 +65,7 @@ export function CalculatorHeader({ language, onLanguageChange, translations }: C
               onSelect={() => handleLanguageSelect("mni")}
               disabled={language === "mni"}
             >
-              Meitei Mayek <span className="font-meetei">(ꯃꯤꯇꯩ  mayamꯦꯛ)</span>
+              Meitei Mayek <span className="font-meetei">(ꯃꯤꯇꯩ ꯃꯌꯦꯛ)</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -63,9 +75,23 @@ export function CalculatorHeader({ language, onLanguageChange, translations }: C
             <History className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </Link>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" aria-label="More information">
+              <Info className="h-4 w-4 sm:h-5 sm:w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={handleHelpClick}>
+              Help
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={handleAboutClick}>
+              About
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
 }
-
-    
