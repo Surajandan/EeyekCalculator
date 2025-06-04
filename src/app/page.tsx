@@ -340,30 +340,30 @@ export default function CalculatorPage() {
                 {translations[language].percentageButton}
             </Button>
             <Button onClick={handleBackspace} className={operatorButtonClass} aria-label="Backspace">
-               <Delete size={24} />
+               <Delete size={24} strokeWidth={2.5} />
             </Button>
-            <Button onClick={() => chooseOperation('divide')} className={operatorButtonClass} aria-label="Divide"><Divide size={24} /></Button>
+            <Button onClick={() => chooseOperation('divide')} className={operatorButtonClass} aria-label="Divide"><Divide size={24} strokeWidth={2.5} /></Button>
 
             {[7, 8, 9].map((digit) => (
               <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
                 {translations[language].digits[digit]}
               </Button>
             ))}
-            <Button onClick={() => chooseOperation('multiply')} className={operatorButtonClass} aria-label="Multiply"><X size={24} /></Button>
+            <Button onClick={() => chooseOperation('multiply')} className={operatorButtonClass} aria-label="Multiply"><X size={24} strokeWidth={2.5} /></Button>
 
             {[4, 5, 6].map((digit) => (
               <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
                 {translations[language].digits[digit]}
               </Button>
             ))}
-            <Button onClick={() => chooseOperation('subtract')} className={operatorButtonClass} aria-label="Subtract"><Minus size={24} /></Button>
+            <Button onClick={() => chooseOperation('subtract')} className={operatorButtonClass} aria-label="Subtract"><Minus size={24} strokeWidth={2.5} /></Button>
 
             {[1, 2, 3].map((digit) => (
               <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
                 {translations[language].digits[digit]}
               </Button>
             ))}
-            <Button onClick={() => chooseOperation('add')} className={operatorButtonClass} aria-label="Add"><Plus size={24} /></Button>
+            <Button onClick={() => chooseOperation('add')} className={operatorButtonClass} aria-label="Add"><Plus size={24} strokeWidth={2.5} /></Button>
 
             <Button onClick={() => addDigit(translations[language].doubleZero)} className={getNumberButtonClass(language)}>
                 {translations[language].doubleZero}
@@ -374,7 +374,7 @@ export default function CalculatorPage() {
             <Button onClick={addDecimalPoint} className={getNumberButtonClass(language)}>
                 {translations[language].decimal}
             </Button>
-            <Button onClick={handleEquals} className={operatorButtonClass} aria-label="Equals"><Equal size={24} /></Button>
+            <Button onClick={handleEquals} className={operatorButtonClass} aria-label="Equals"><Equal size={24} strokeWidth={2.5} /></Button>
           </div>
         </CalculatorContainer>
       </main>
