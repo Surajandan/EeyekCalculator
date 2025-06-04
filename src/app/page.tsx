@@ -8,6 +8,7 @@ import { CalculatorHeader } from '@/components/calculator/calculator-header';
 import { CalculatorDisplay } from '@/components/calculator/calculator-display';
 import { Divide, X, Minus, Plus, Equal } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 interface HistoryItem {
   id: string;
@@ -26,9 +27,9 @@ const translations = {
   },
   mni: {
     pageTitle: "ꯂꯣꯀꯦꯜ ꯀꯦꯜꯛ",
-    acButton: "AC", 
+    acButton: "AC",
     digits: ["꯰", "꯱", "꯲", "꯳", "꯴", "꯵", "꯶", "꯷", "꯸", "꯹"],
-    decimal: ".", 
+    decimal: ".",
   }
 };
 
@@ -72,9 +73,9 @@ export default function CalculatorPage() {
       default: return '';
     }
   };
-  
-  const expressionPreview = previousOperand && operation 
-    ? `${previousOperand} ${operationToSymbol(operation)}` 
+
+  const expressionPreview = previousOperand && operation
+    ? `${previousOperand} ${operationToSymbol(operation)}`
     : '';
 
   const addDigit = (digit: string) => {
@@ -91,7 +92,7 @@ export default function CalculatorPage() {
       setOverwrite(false);
     } else {
       if (englishDigit === "0" && (currentOperand === translations.en.digits[0] || currentOperand === translations.mni.digits[0])) return;
-      if (currentOperand.length >= 16) return; 
+      if (currentOperand.length >= 16) return;
       setCurrentOperand(prev => ((prev === translations.en.digits[0] || prev === translations.mni.digits[0]) && englishDigit !== ".") ? translations[language].digits[parseInt(englishDigit)] : prev + translations[language].digits[parseInt(englishDigit)]);
     }
   };
@@ -114,40 +115,37 @@ export default function CalculatorPage() {
   };
 
   const chooseOperation = (op: string) => {
-    if (currentOperand === "Error" && op) { 
-        setPreviousOperand(null); 
+    if (currentOperand === "Error" && op) {
+        setPreviousOperand(null);
         setOperation(null);
         return;
     }
-    if (previousOperand !== null && operation !== null && !overwrite) { 
-      evaluate(); 
-      // After evaluation, currentOperand holds the result.
-      // We need to ensure it's set as previousOperand *before* setting the new operation.
-      setPreviousOperand(currentOperand); 
+    if (previousOperand !== null && operation !== null && !overwrite) {
+      evaluate();
+      setPreviousOperand(currentOperand);
     } else {
       setPreviousOperand(currentOperand);
     }
-    
+
     setOperation(op);
     setOverwrite(true);
   };
-  
+
   const evaluate = () => {
     if (!operation || previousOperand === null || currentOperand === "Error") return;
 
-    // Normalize operands to English numbers before parseFloat
     const normalizeOperand = (operand: string) => {
+      let normalized = operand;
       if (language === 'mni') {
-        let normalized = operand;
         translations.mni.digits.forEach((mniDigit, index) => {
           const regex = new RegExp(mniDigit, 'g');
           normalized = normalized.replace(regex, translations.en.digits[index]);
         });
-        return normalized;
+        normalized = normalized.replace(new RegExp(translations.mni.decimal, 'g'), translations.en.decimal);
       }
-      return operand;
+      return normalized;
     };
-  
+
     const prevNormalized = normalizeOperand(previousOperand);
     const currentNormalized = normalizeOperand(currentOperand);
 
@@ -176,10 +174,10 @@ export default function CalculatorPage() {
           setPreviousOperand(null);
           setOperation(null);
           setOverwrite(true);
-          const errorEntry: HistoryItem = { 
-            id: Date.now().toString(), 
-            expression: `${previousOperand} ${operationToSymbol(operation)} ${currentOperand}`, 
-            result: "Error" 
+          const errorEntry: HistoryItem = {
+            id: Date.now().toString(),
+            expression: `${previousOperand} ${operationToSymbol(operation)} ${currentOperand}`,
+            result: "Error"
           };
           saveHistory([errorEntry, ...history.slice(0, MAX_HISTORY_ITEMS - 1)]);
           return;
@@ -188,17 +186,18 @@ export default function CalculatorPage() {
         break;
       default: return;
     }
-    
-    let resultString = String(parseFloat(computation.toPrecision(12))); 
-    
-    // Convert result back to selected language if mni
+
+    let resultString = String(parseFloat(computation.toPrecision(12)));
+
     if (language === 'mni') {
       let mniResult = "";
       for (const char of resultString) {
         if (char >= '0' && char <= '9') {
           mniResult += translations.mni.digits[parseInt(char)];
+        } else if (char === translations.en.decimal) {
+          mniResult += translations.mni.decimal;
         } else {
-          mniResult += char; // Keep non-digits like '.', '-'
+          mniResult += char; // Keep non-digits like '-'
         }
       }
       resultString = mniResult;
@@ -207,13 +206,13 @@ export default function CalculatorPage() {
     const expressionString = `${previousOperand} ${operationToSymbol(operation)} ${currentOperand}`;
     const newEntry: HistoryItem = { id: Date.now().toString(), expression: expressionString, result: resultString };
     saveHistory([newEntry, ...history.slice(0, MAX_HISTORY_ITEMS - 1)]);
-    
+
     setCurrentOperand(resultString);
-    setPreviousOperand(null); 
+    setPreviousOperand(null);
     setOperation(null);
-    setOverwrite(true); 
+    setOverwrite(true);
   };
-  
+
   const handleEquals = () => {
     evaluate();
   }
@@ -227,27 +226,26 @@ export default function CalculatorPage() {
 
   const toggleSign = () => {
     if (currentOperand === "Error" || currentOperand === translations[language].digits[0]) return;
-    
-    // Normalize to perform math
+
     let normalizedCurrentOperand = currentOperand;
     if (language === 'mni') {
         translations.mni.digits.forEach((mniDigit, index) => {
             const regex = new RegExp(mniDigit, 'g');
             normalizedCurrentOperand = normalizedCurrentOperand.replace(regex, translations.en.digits[index]);
         });
+        normalizedCurrentOperand = normalizedCurrentOperand.replace(new RegExp(translations.mni.decimal, 'g'), translations.en.decimal);
     }
 
     let toggledValue = String(parseFloat(normalizedCurrentOperand) * -1);
 
-    // Convert back to selected language if mni
     if (language === 'mni') {
         let mniToggledValue = "";
         for (const char of toggledValue) {
             if (char >= '0' && char <= '9') {
                 mniToggledValue += translations.mni.digits[parseInt(char)];
-            } else if (char === translations.en.decimal && translations.mni.decimal) {
+            } else if (char === translations.en.decimal) {
                 mniToggledValue += translations.mni.decimal;
-            } 
+            }
             else {
                 mniToggledValue += char; // Keep non-digits like '-'
             }
@@ -261,77 +259,91 @@ export default function CalculatorPage() {
   const operatorButtonClass = `${buttonClass} bg-primary/80 hover:bg-primary/90 text-primary-foreground`;
   const getNumberButtonClass = (lang: keyof typeof translations) => `${buttonClass} bg-secondary hover:bg-secondary/90 text-secondary-foreground ${lang === 'mni' ? 'font-meetei' : ''}`;
 
-
   return (
-    <CalculatorContainer>
-      <CalculatorHeader 
-        language={language} 
-        onLanguageChange={(lang) => {
-          const newLang = lang as keyof typeof translations;
-          setLanguage(newLang);
-          // When language changes, reset display to 0 of the new language if it was 0 in old lang
-          if (currentOperand === translations[language].digits[0]) {
-             setCurrentOperand(translations[newLang].digits[0]);
-          }
-          if (previousOperand === translations[language].digits[0]) {
-            setPreviousOperand(translations[newLang].digits[0]);
-          }
-        }}
-        translations={translations} 
-      />
-      <CalculatorDisplay currentOperand={currentOperand} expressionPreview={expressionPreview} />
-      <div className="grid grid-cols-4 gap-2 sm:gap-3">
-        <Button onClick={clearAll} className={`${getNumberButtonClass(language)} col-span-2`}>
-          {translations[language].acButton}
-        </Button>
-        <Button onClick={toggleSign} className={getNumberButtonClass(language)}>
-           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M4 7h6"/>
-            <path d="M7 4v6"/>
-            <path d="M18 13H5"/>
-          </svg>
-        </Button>
-        <Button onClick={() => chooseOperation('divide')} className={operatorButtonClass}><Divide size={24} /></Button>
+    <div className="flex flex-col min-h-screen bg-background">
+      <main className="flex-grow flex flex-col items-center justify-center p-2 sm:p-4">
+        <CalculatorContainer>
+          <CalculatorHeader
+            language={language}
+            onLanguageChange={(lang) => {
+              const newLang = lang as keyof typeof translations;
+              setLanguage(newLang);
+              if (currentOperand === translations[language].digits[0]) {
+                 setCurrentOperand(translations[newLang].digits[0]);
+              }
+              if (previousOperand === translations[language].digits[0]) {
+                setPreviousOperand(translations[newLang].digits[0]);
+              }
+            }}
+            translations={translations}
+          />
+          <CalculatorDisplay currentOperand={currentOperand} expressionPreview={expressionPreview} />
+          <div className="grid grid-cols-4 gap-2 sm:gap-3">
+            <Button onClick={clearAll} className={`${getNumberButtonClass(language)} col-span-2`}>
+              {translations[language].acButton}
+            </Button>
+            <Button onClick={toggleSign} className={getNumberButtonClass(language)}>
+               <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 7h6"/>
+                <path d="M7 4v6"/>
+                <path d="M18 13H5"/>
+              </svg>
+            </Button>
+            <Button onClick={() => chooseOperation('divide')} className={operatorButtonClass}><Divide size={24} /></Button>
 
-        {[7, 8, 9].map((digit) => (
-          <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
-            {translations[language].digits[digit]}
-          </Button>
-        ))}
-        <Button onClick={() => chooseOperation('multiply')} className={operatorButtonClass}><X size={24} /></Button>
+            {[7, 8, 9].map((digit) => (
+              <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
+                {translations[language].digits[digit]}
+              </Button>
+            ))}
+            <Button onClick={() => chooseOperation('multiply')} className={operatorButtonClass}><X size={24} /></Button>
 
-        {[4, 5, 6].map((digit) => (
-          <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
-            {translations[language].digits[digit]}
-          </Button>
-        ))}
-        <Button onClick={() => chooseOperation('subtract')} className={operatorButtonClass}><Minus size={24} /></Button>
+            {[4, 5, 6].map((digit) => (
+              <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
+                {translations[language].digits[digit]}
+              </Button>
+            ))}
+            <Button onClick={() => chooseOperation('subtract')} className={operatorButtonClass}><Minus size={24} /></Button>
 
-        {[1, 2, 3].map((digit) => (
-          <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
-            {translations[language].digits[digit]}
-          </Button>
-        ))}
-        <Button onClick={() => chooseOperation('add')} className={operatorButtonClass}><Plus size={24} /></Button>
+            {[1, 2, 3].map((digit) => (
+              <Button key={digit} onClick={() => addDigit(translations[language].digits[digit])} className={getNumberButtonClass(language)}>
+                {translations[language].digits[digit]}
+              </Button>
+            ))}
+            <Button onClick={() => chooseOperation('add')} className={operatorButtonClass}><Plus size={24} /></Button>
 
-        <Button onClick={() => addDigit(translations[language].digits[0])} className={`${getNumberButtonClass(language)} col-span-2`}>
-            {translations[language].digits[0]}
-        </Button>
-        <Button onClick={addDecimalPoint} className={getNumberButtonClass(language)}>
-            {translations[language].decimal}
-        </Button>
-        <Button onClick={handleEquals} className={operatorButtonClass}><Equal size={24} /></Button>
-      </div>
-    </CalculatorContainer>
+            <Button onClick={() => addDigit(translations[language].digits[0])} className={`${getNumberButtonClass(language)} col-span-2`}>
+                {translations[language].digits[0]}
+            </Button>
+            <Button onClick={addDecimalPoint} className={getNumberButtonClass(language)}>
+                {translations[language].decimal}
+            </Button>
+            <Button onClick={handleEquals} className={operatorButtonClass}><Equal size={24} /></Button>
+          </div>
+        </CalculatorContainer>
+      </main>
+      <footer className="bg-muted text-muted-foreground p-4 text-center text-sm">
+        <p className="mb-2">Your Ad Here - Support Local Calc!</p>
+        <Image
+          src="https://placehold.co/728x90.png"
+          alt="Advertisement Placeholder"
+          width={728}
+          height={90}
+          className="mx-auto w-full max-w-[728px] h-auto rounded-md shadow"
+          data-ai-hint="advertisement banner"
+          priority={false} 
+        />
+      </footer>
+    </div>
   );
 }
