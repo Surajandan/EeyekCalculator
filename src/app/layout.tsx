@@ -3,6 +3,7 @@ import type {Metadata} from 'next';
 import localFont from 'next/font/local'; // Keep for Noto Sans
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from '@/components/theme-provider';
 
 // Define your local fonts
 // Make sure to place your font files in the src/fonts directory
@@ -61,13 +62,19 @@ export default function RootLayout({
   return (
     // Apply only Noto Sans Meetei Mayek for now. Uncomment inter.variable when Inter font issue is resolved.
     // Remove notoSansMeeteiMayek.variable as it's commented out
-    <html lang="en" className={``}> 
+    <html lang="en" className={``} suppressHydrationWarning> 
       <head>
         {/* Google Fonts links removed as we are using local fonts now */}
       </head>
       <body className="font-body antialiased">
-        {children}
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

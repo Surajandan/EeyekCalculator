@@ -2,17 +2,18 @@
 "use client";
 
 import Link from 'next/link';
-import { History, Info } from 'lucide-react'; // Added Info import
+import { History, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator
+  DropdownMenuSeparator, // Added DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import type { Dispatch, SetStateAction } from 'react';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 interface CalculatorHeaderProps {
   language: string;
@@ -21,6 +22,13 @@ interface CalculatorHeaderProps {
 }
 
 export function CalculatorHeader({ language, onLanguageChange, translations }: CalculatorHeaderProps) {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handleLanguageSelect = (lang: string) => {
     onLanguageChange(lang);
   };
@@ -88,6 +96,16 @@ export function CalculatorHeader({ language, onLanguageChange, translations }: C
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={handleAboutClick}>
               About
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onSelect={() => {
+                if (mounted) {
+                  setTheme(theme === 'dark' ? 'light' : 'dark');
+                }
+              }}
+            >
+              {mounted ? (theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode') : 'Toggle Theme...'}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
