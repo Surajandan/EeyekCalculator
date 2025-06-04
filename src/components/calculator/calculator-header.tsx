@@ -9,7 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator, // Added DropdownMenuSeparator
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import type { Dispatch, SetStateAction } from 'react';
 import { useTheme } from 'next-themes';
@@ -48,7 +48,7 @@ export function CalculatorHeader({ language, onLanguageChange, translations }: C
 
   return (
     <header className="flex justify-between items-center mb-4">
-      <h1 className={`text-2xl sm:text-3xl font-bold font-headline text-foreground ${language === 'mni' ? 'font-meetei' : ''}`}>
+      <h1 className={`text-xl sm:text-2xl font-semibold font-headline text-foreground ${language === 'mni' ? 'font-meetei' : ''}`}>
         {pageTitle}
       </h1>
       <div className="flex items-center gap-2">
