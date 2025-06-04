@@ -10,23 +10,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 
-export function CalculatorHeader() {
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
+interface CalculatorHeaderProps {
+  language: string;
+  onLanguageChange: Dispatch<SetStateAction<string>>;
+  translations: Record<string, Record<string, string>>;
+}
 
-  const handleLanguageChange = (lang: string) => {
-    setSelectedLanguage(lang);
-    console.log(`Language changed to: ${lang}`);
-    // In a real application, you would trigger your i18n logic here
-    // to update the application's text content.
-    // For Meitei Mayek, if the font is correctly set up,
-    // UI elements could use the 'font-meetei' class.
+export function CalculatorHeader({ language, onLanguageChange, translations }: CalculatorHeaderProps) {
+  const handleLanguageSelect = (lang: string) => {
+    onLanguageChange(lang);
   };
+
+  const currentTranslation = translations[language] || translations.en;
 
   return (
     <header className="flex justify-between items-center mb-4">
-      <h1 className="text-2xl sm:text-3xl font-bold font-headline text-foreground">Local Calc</h1>
+      <h1 className={`text-2xl sm:text-3xl font-bold font-headline text-foreground ${language === 'mni' ? 'font-meetei' : ''}`}>
+        {currentTranslation.pageTitle}
+      </h1>
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -35,13 +38,20 @@ export function CalculatorHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onSelect={() => handleLanguageChange("en")} disabled={selectedLanguage === "en"}>
+            <DropdownMenuItem 
+              onSelect={() => handleLanguageSelect("en")} 
+              disabled={language === "en"}
+              className={language === 'mni' ? 'font-meetei' : ''}
+            >
               English
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => handleLanguageChange("mni")} disabled={selectedLanguage === "mni"}>
+            <DropdownMenuItem 
+              onSelect={() => handleLanguageSelect("mni")} 
+              disabled={language === "mni"}
+              className={language === 'mni' ? 'font-meetei' : ''}
+            >
               Meitei Mayek (ꯃꯤꯇꯩ ꯃꯌꯦꯛ)
             </DropdownMenuItem>
-            {/* You can add more languages here */}
           </DropdownMenuContent>
         </DropdownMenu>
 

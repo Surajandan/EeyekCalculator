@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -16,12 +17,24 @@ interface HistoryItem {
 
 const MAX_HISTORY_ITEMS = 50; // Limit history size
 
+const translations = {
+  en: {
+    pageTitle: "Local Calc",
+    acButton: "AC",
+  },
+  mni: {
+    pageTitle: "ꯂꯣꯀꯦꯜ ꯀꯦꯜꯛ",
+    acButton: "AC", // Placeholder, can be changed to Meitei script
+  }
+};
+
 export default function CalculatorPage() {
   const [currentOperand, setCurrentOperand] = useState<string>("0");
   const [previousOperand, setPreviousOperand] = useState<string | null>(null);
   const [operation, setOperation] = useState<string | null>(null);
-  const [overwrite, setOverwrite] = useState<boolean>(true); // Start by overwriting initial "0"
+  const [overwrite, setOverwrite] = useState<boolean>(true);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [language, setLanguage] = useState<keyof typeof translations>("en");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -61,7 +74,7 @@ export default function CalculatorPage() {
       setOverwrite(false);
     } else {
       if (digit === "0" && currentOperand === "0") return;
-      if (currentOperand.length >= 16) return; // Max digit limit
+      if (currentOperand.length >= 16) return; 
       setCurrentOperand(prev => (prev === "0" && digit !== ".") ? digit : prev + digit);
     }
   };
@@ -83,17 +96,14 @@ export default function CalculatorPage() {
   };
 
   const chooseOperation = (op: string) => {
-    if (currentOperand === "Error" && op) { // Allow choosing op if error, effectively clearing
+    if (currentOperand === "Error" && op) { 
         setPreviousOperand(null); 
         setOperation(null);
-        // setCurrentOperand("0"); // Let next digit input handle error state
-        // setOverwrite(true);
         return;
     }
-    if (previousOperand !== null && operation !== null && !overwrite) { // !overwrite means currentOperand is a new number
-      evaluate(); // Evaluate the previous operation before starting a new one
-      // After evaluate, currentOperand holds the result. This result becomes previousOperand for the new op.
-      setPreviousOperand(currentOperand); // This line was missing to chain operations correctly
+    if (previousOperand !== null && operation !== null && !overwrite) { 
+      evaluate(); 
+      setPreviousOperand(currentOperand); 
     } else {
       setPreviousOperand(currentOperand);
     }
@@ -133,24 +143,15 @@ export default function CalculatorPage() {
       default: return;
     }
     
-    const resultString = String(parseFloat(computation.toPrecision(12))); // Handle floating point precision display
+    const resultString = String(parseFloat(computation.toPrecision(12))); 
     const expressionString = `${previousOperand} ${operationToSymbol(operation)} ${currentOperand}`;
     const newEntry: HistoryItem = { id: Date.now().toString(), expression: expressionString, result: resultString };
     saveHistory([newEntry, ...history.slice(0, MAX_HISTORY_ITEMS - 1)]);
     
     setCurrentOperand(resultString);
-    // For immediate further operations, the result is the new previousOperand if an operator is hit next.
-    // For now, clearing previousOperand and operation means user needs to re-input if they want to use the result
-    // setPreviousOperand(null); // This was the issue for chaining. It should become the result.
-    // setOperation(null); // This should be cleared if they hit equals, not an op.
-    
-    // If equals was pressed, previousOperand should be cleared. If another op is pressed, it's handled by chooseOperation.
-    // Let's manage this in chooseOperation for chaining, and clear for equals.
-    // For now, set overwrite, previousOperand becomes current, operation is cleared.
-    // This is logic for "=":
-    setPreviousOperand(null); // After equals, previous is cleared
+    setPreviousOperand(null); 
     setOperation(null);
-    setOverwrite(true); // Ready for new input, result is displayed.
+    setOverwrite(true); 
   };
   
   const handleEquals = () => {
@@ -175,12 +176,18 @@ export default function CalculatorPage() {
 
   return (
     <CalculatorContainer>
-      <CalculatorHeader />
+      <CalculatorHeader 
+        language={language} 
+        onLanguageChange={setLanguage} 
+        translations={translations} 
+      />
       <CalculatorDisplay currentOperand={currentOperand} expressionPreview={expressionPreview} />
       <div className="grid grid-cols-4 gap-2 sm:gap-3">
-        <Button onClick={clearAll} className={`${numberButtonClass} col-span-2`}>AC</Button>
+        <Button onClick={clearAll} className={`${numberButtonClass} col-span-2 ${language === 'mni' ? 'font-meetei' : ''}`}>
+          {translations[language].acButton}
+        </Button>
         <Button onClick={toggleSign} className={numberButtonClass}>
-          <svg
+           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
