@@ -12,6 +12,7 @@ export default {
       fontFamily: {
         body: ['var(--font-inter)', 'sans-serif'], // Use the CSS variable for Inter
         headline: ['var(--font-inter)', 'sans-serif'], // Use the CSS variable for Inter
+        meetei: ['var(--font-noto-sans-meetei-mayek)', 'sans-serif'], // Added Noto Sans Meetei Mayek
         code: ['monospace'],
       },
       colors: {
