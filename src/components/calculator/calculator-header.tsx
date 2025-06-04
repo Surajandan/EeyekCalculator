@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { History, Info, Languages, Moon, Sun, XIcon, Delete } from 'lucide-react'; // Added Delete
+import { History, Info, Languages, Moon, Sun, XIcon, Delete } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -34,6 +34,7 @@ export function CalculatorHeader({ language, onLanguageChange, translations }: C
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
+  const [isAboutDialogOpen, setIsAboutDialogOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -41,11 +42,6 @@ export function CalculatorHeader({ language, onLanguageChange, translations }: C
 
   const handleLanguageSelect = (lang: string) => {
     onLanguageChange(lang);
-  };
-
-  const handleAboutClick = () => {
-    console.log("About clicked");
-    // Potentially navigate to an about page or open an about modal
   };
 
   const currentTranslationSet = translations[language] || translations.en;
@@ -100,7 +96,7 @@ export function CalculatorHeader({ language, onLanguageChange, translations }: C
               <DropdownMenuItem onSelect={() => setIsHelpDialogOpen(true)}>
                 Help
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleAboutClick}>
+              <DropdownMenuItem onSelect={() => setIsAboutDialogOpen(true)}>
                 About
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -125,6 +121,7 @@ export function CalculatorHeader({ language, onLanguageChange, translations }: C
         </div>
       </header>
 
+      {/* Help Dialog */}
       <Dialog open={isHelpDialogOpen} onOpenChange={setIsHelpDialogOpen}>
         <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -176,7 +173,7 @@ export function CalculatorHeader({ language, onLanguageChange, translations }: C
                 <li><strong>Info Menu (<Info className="inline-block h-4 w-4 align-text-bottom" />):</strong>
                   <ul className="list-disc list-inside pl-6 space-y-1">
                     <li><strong>Help:</strong> Opens this guide.</li>
-                    <li><strong>About:</strong> (Currently logs to console) Displays information about the app.</li>
+                    <li><strong>About:</strong> Displays information about the app.</li>
                     <li><strong>Theme Toggle (<Sun className="inline-block h-4 w-4 align-text-bottom" /> / <Moon className="inline-block h-4 w-4 align-text-bottom" />):</strong> Switches between light and dark themes.</li>
                   </ul>
                 </li>
@@ -190,6 +187,37 @@ export function CalculatorHeader({ language, onLanguageChange, translations }: C
               </Button>
             </DialogClose>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* About Dialog */}
+      <Dialog open={isAboutDialogOpen} onOpenChange={setIsAboutDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">About Eeyek Calculator</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-sm text-center space-y-2">
+            <p>
+              Eeyek Calculator
+            </p>
+            <p>
+              Designed and Developed by:
+              <br />
+              <strong>Nongshaba Technology Solutions Private Limited</strong>
+            </p>
+          </div>
+          <DialogFooter className="justify-center sm:justify-center">
+            <p className="text-xs text-muted-foreground">
+              Copyright © 2025 Nongshaba Technology Solutions Private Limited.
+              <br />
+              All rights reserved.
+            </p>
+          </DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="outline" className="mt-4 w-full">
+              Close
+            </Button>
+          </DialogClose>
         </DialogContent>
       </Dialog>
     </>
