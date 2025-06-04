@@ -1,6 +1,28 @@
 import type {Metadata} from 'next';
+// import localFont from 'next/font/local'; // Temporarily commented out
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
+
+// Define your local fonts
+// Make sure to place your font files in the src/fonts directory
+/* Temporarily commented out:
+const inter = localFont({
+  src: [
+    {
+      path: '../fonts/Inter-Regular.woff2', // Adjust path and filename as needed
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Inter-Bold.woff2', // Adjust path and filename as needed
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-inter', // CSS variable to be used in Tailwind
+  display: 'swap',
+});
+*/
 
 export const metadata: Metadata = {
   title: 'Local Calc',
@@ -13,11 +35,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // Temporarily removed inter.variable from className
+    <html lang="en" className={""}> 
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+        {/* Google Fonts links removed as we are using local fonts now */}
       </head>
       <body className="font-body antialiased">
         {children}
